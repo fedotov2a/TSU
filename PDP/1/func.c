@@ -1,9 +1,14 @@
 #include "func.h"
 
 void init() {
-    memset(sumT, 0, NUM_THREADS);
-    memset(maxT, 0, NUM_THREADS);
-    memset(minT, UPPER_BOUND + 1, NUM_THREADS);
+    // memset(sumT,    0,               NUM_THREADS);
+    // memset(maxT,    0,               sizeof(maxT) * sizeof(int));
+    // memset(minT,    UPPER_BOUND + 1, sizeof(minT) * sizeof(int));
+    for (int i = 0; i < NUM_THREADS; i++) {
+        sumT[i] = 0;
+        maxT[i] = 0;
+        minT[i] = UPPER_BOUND + 1;
+    }
     fillArrayRandomNumbers(bigArray, SIZE_ARRAY);
 }
 
@@ -12,11 +17,28 @@ void sum_(int* array, int size) {
     for (int i = 0; i < size; i++) {
         sum += array[i];
     }
-    printf("%d\n", sum);
+    printf("sum = %d\n", sum);
 }
 
-void min_() {}
-void max_() {}
+void min_(int* array, int size) {
+    int min = minT[0];
+    for (int i = 1; i < size; i++) {
+        if (minT[i] < min) {
+            min = minT[i];
+        }
+    }
+    printf("min = %d\n", min);
+}
+
+void max_(int* array, int size) {
+    int max = maxT[0];
+    for (int i = 1; i < size; i++) {
+        if (maxT[i] > max) {
+            max = maxT[i];
+        }
+    }
+    printf("max = %d\n", max);
+}
 
 void printArray(int* array, int size) {
     for (int i = 0; i < size; i++) {
@@ -35,14 +57,14 @@ void fillArrayRandomNumbers(int* array, int size) {
 }
 
 /*
---------------------------------------
-----------PARALLEL FUNCTIONS----------
---------------------------------------
+-----------------------------------------
+----------PARALLEL FUNCTIONS-------------
+-----------------------------------------
 */
 
 void* parallelSum(void* idThread) {
     int id = (int) idThread;
-
+    printf("%d %d\n", id, sumT[id]);
     for (int i = id * SIZE_ARRAY / NUM_THREADS; i < (id + 1) * SIZE_ARRAY / NUM_THREADS; i++) {
         sumT[id] += bigArray[i];
     }
@@ -50,9 +72,29 @@ void* parallelSum(void* idThread) {
     return NULL;
 }
 
-void* parallelMin(void* idThread) {}
+void* parallelMin(void* idThread) {
+    int id = (int) idThread;
 
-void* parallelMax(void* idThread) {}
+    for (int i = id * SIZE_ARRAY / NUM_THREADS; i < (id + 1) * SIZE_ARRAY / NUM_THREADS; i++) {
+        if (bigArray[i] < minT[id]) {
+            minT[id] = bigArray[i];
+        }
+    }
+
+    return NULL;
+}
+
+void* parallelMax(void* idThread) {
+    int id = (int) idThread;
+
+    for (int i = id * SIZE_ARRAY / NUM_THREADS; i < (id + 1) * SIZE_ARRAY / NUM_THREADS; i++) {
+        if (bigArray[i] > maxT[id]) {
+            maxT[id] = bigArray[i];
+        }
+    }
+
+    return NULL;
+}
 
 void createThreads(func f) {
     int rc;
