@@ -3,11 +3,12 @@
 int main() {
     init();
 
-    createThreads(parallelSum);
+    createThreads(parallelMax);
     waitAllThreads();
 
-    sum_      (sumT, NUM_THREADS);
-    printArray(sumT, NUM_THREADS);
+    max_      (maxT, NUM_THREADS);
+    printArray(maxT, NUM_THREADS);
+    printArray(bigArray, SIZE_ARRAY);
 
     return 0;
 }
