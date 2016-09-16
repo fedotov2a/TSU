@@ -20,8 +20,8 @@ int          maxT[NUM_THREADS];
 void init();
 
 void sum_(int* array, int size);
-void min_();
-void max_();
+void min_(int* array, int size);
+void max_(int* array, int size);
 
 void printArray(int* array, int size);
 void fillArrayRandomNumbers(int* array, int size);
