@@ -1,3 +1,8 @@
+/* 
+    Linux:
+        gcc -std=c99 -pthread integrate_PI_2.c -o pi
+        ./pi
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
