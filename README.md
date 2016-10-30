@@ -1,2 +1,3 @@
 # TSU
-1. parallel and distributed programming
+1. Algorithmic basics of multimedia technologies (Processing Signals)
+2. Parallel and distributed programming
