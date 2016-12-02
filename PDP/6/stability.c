@@ -32,11 +32,21 @@ void getNextNumber() {
         return;
     }
 
-    for (int i = N - 1; i >= 0; ) {
-        number[i]++;
+    int carry = 0;
+    for (int i = N - 1; i > 0; ) {
+        if (carry == 0) {
+            number[i]++;
+        }
+        
         if (number[i] >= 10) {
+            carry = 1;
             number[i] = 0;
-            i--;
+            number[i-1]++;
+            if (number[i-1] >= 10) {
+                i--;
+            } else {
+                break;
+            }
         } else {
             break;
         }
