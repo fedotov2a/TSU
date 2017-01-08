@@ -24,9 +24,6 @@ double* min_distances;
 int* min_paths;
 
 int* generate_path(int rank) {
-    usleep( (rank + number_cities) * MAX_ITER * number_cities );
-    srand((unsigned)time(NULL) + (rank + 1) * number_cities);
-
     int* cities = (int*) malloc( number_cities * sizeof(int) );
     cities[0] = -1;
 
@@ -114,6 +111,9 @@ int main(int argc, char* argv[]) {
 
     int* path;
     double distance;
+
+    usleep( (rank + number_cities) * MAX_ITER * number_cities );
+    srand((unsigned)time(NULL) + (rank + 1) * number_cities);
 
     /* Main work */
     while (iter < MAX_ITER) {
