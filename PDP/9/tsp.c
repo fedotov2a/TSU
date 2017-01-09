@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <float.h>
 
-#define MAX_ITER  700
+#define MAX_ITER  1000000
 
 /* Матрица расстояний */
 double* matrix_distances;
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
     int* path;
     double distance;
 
-    usleep( (rank + number_cities) * MAX_ITER * number_cities );
+    usleep( (rank + number_cities) * number_cities );
     srand((unsigned)time(NULL) + (rank + 1) * number_cities);
 
     /* Main work */
@@ -178,14 +178,14 @@ int main(int argc, char* argv[]) {
 
         fclose(result);
 
-        int* pp = (int*) malloc( (number_cities + 1) * sizeof(int) );
-        pp[0] = 0;
-        pp[number_cities] = 0;
-        for (int i = 1; i < number_cities; i++) {
-            pp[i] = i;
-        }
-        double pp_p = which_distance(pp);
-        printf("\n%lf\n", pp_p);
+//         int* pp = (int*) malloc( (number_cities + 1) * sizeof(int) );
+//         pp[0] = 0;
+//         pp[number_cities] = 0;
+//         for (int i = 1; i < number_cities; i++) {
+//             pp[i] = i;
+//         }
+//         double pp_p = which_distance(pp);
+//         printf("\n%lf\n", pp_p);
     }
 
 
