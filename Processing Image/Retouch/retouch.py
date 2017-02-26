@@ -111,7 +111,6 @@ def get_artefacts_map(image_gray):
     return artefacts_map
 
 # Перекрашивание битых пикселей
-# Возвращает изображение, не карту пикселей!
 def retouch(image_rgb, artefacts):
     pixel_map = image_rgb.load()
     
