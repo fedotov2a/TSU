@@ -130,11 +130,100 @@ def retouch(image_rgb, artefacts):
     return new_img
 
 #------------------------------------------------------------------------------
+
+def vertical_wv(image):
+    pixel_map = image.load()
+    
+    width  = image.size[W]
+    height = image.size[H]
+    
+    img_wv = Image.new(image.mode, image.size)
+    img_wv_map = img_wv.load() 
+    
+    for x in range(0, height-1, 2):
+        for y in range(width):
+            a = (pixel_map[x, y][GRAY] + pixel_map[x+1, y][GRAY]) // 2
+            d = (pixel_map[x, y][GRAY] - pixel_map[x+1, y][GRAY]) // 2
+            img_wv_map[x/2, y] = (a, a, a)
+            img_wv_map[height/2 + x/2, y] = (d, d, d)
+            
+    return img_wv
+
+def horizontal_wv(image):
+    pixel_map = image.load()
+    
+    width  = image.size[W]
+    height = image.size[H]
+    
+    img_wv = Image.new(image.mode, image.size)
+    img_wv_map = img_wv.load() 
+    
+    for x in range(height):
+        for y in range(0, width-1, 2):
+            a = (pixel_map[x, y][GRAY] + pixel_map[x, y+1][GRAY]) // 2
+            d = (pixel_map[x, y][GRAY] - pixel_map[x, y+1][GRAY]) // 2
+            img_wv_map[x, y/2] = (a, a, a)
+            img_wv_map[x, width/2 + y/2] = (d, d, d)
+            
+    return img_wv
+
+def wavelet(image):
+    img_wv = horizontal_wv(vertical_wv(image))
+    return img_wv
+
+#------------------------------------------------------------------------------
+
+def vertical_rev_wv(image_wv):
+    pixel_map = image_wv.load()
+    
+    width  = image_wv.size[W]
+    height = image_wv.size[H]
+    
+    img_rev_h = Image.new(image_wv.mode, image_wv.size)
+    img_rev_h_map = img_rev_h.load()
+    
+    x_ = 0
+    for x in range(height//2):
+        for y in range(width):
+            a = pixel_map[x, y][GRAY] + pixel_map[height//2 + x, y][GRAY]
+            d = pixel_map[x, y][GRAY] - pixel_map[height//2 + x, y][GRAY]
+            img_rev_h_map[x_, y]   = (a, a, a)
+            img_rev_h_map[x_+1, y] = (d, d, d)
+        x_ += 2
+    
+    return img_rev_h
+
+def horizontal_rev_wv(image_wv):
+    pixel_map = image_wv.load()
+    
+    width  = image_wv.size[W]
+    height = image_wv.size[H]
+    
+    img_rev_v = Image.new(image_wv.mode, image_wv.size)
+    img_rev_v_map = img_rev_v.load()
+    
+    for x in range(height):
+        y_ = 0
+        for y in range(width // 2):
+            a = pixel_map[x, y][GRAY] + pixel_map[x, width//2 + y][GRAY]
+            d = pixel_map[x, y][GRAY] - pixel_map[x, width//2 + y][GRAY]
+            img_rev_v_map[x, y_]   = (a, a, a)
+            img_rev_v_map[x, y_+1] = (d, d, d)
+            y_ += 2
+    
+    return img_rev_v
+
+def rev_wavelet(image_wv):
+    img_rev_wv = vertical_rev_wv(horizontal_rev_wv(image_wv))
+    return img_rev_wv
+
+    
+#------------------------------------------------------------------------------
 root = tk.Tk()
 root.geometry("1042x650")
 
 # Загрузка изображения
-img_ruined_rgb = Image.open("me_r.bmp")
+img_ruined_rgb = Image.open("me_nr3.bmp")
 
 # Преобразование в 50 оттенков серого
 img_ruined_gray = rgb2gray(img_ruined_rgb)
@@ -144,11 +233,16 @@ artefacts_map = get_artefacts_map(img_ruined_gray)
 
 # Перекрашивание битых пикселей
 img_retouch = retouch(img_ruined_rgb, artefacts_map)
-img_retouch.save("me_s.bmp")
+img_retouch.save("me_saved.bmp")
 
 # Конвертирование для отрисовки на форме
 img_ruined  = pil2tk_image(img_ruined_rgb)
 img_saved   = pil2tk_image(img_retouch)
+
+
+img_wv = wavelet(img_ruined_gray)
+img_wv = rev_wavelet(img_wv)
+img_saved   = pil2tk_image(img_wv)
 
 # Рисуем картинку слева
 label_left = tk.Label(root, image = img_ruined)
