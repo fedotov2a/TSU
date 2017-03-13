@@ -10,9 +10,6 @@ G = 1
 B = 2
 GRAY = 0
 
-# Порог
-THRESHOLD = 400
-
 # Фильтры (маски)
 dot_matrix = [-1, -1, -1, -1, 8, -1, -1, -1, -1]
 horizontal_line_matrix = [-1, -1, -1, 2, 2, 2, -1, -1, -1]
@@ -94,11 +91,12 @@ def get_avg_value(pixel_map, artefacts, x, y):
 #------------------------------------------------------------------------------
 
 # Определение битых пикселей
-def get_artefacts_map(image_gray):
+def get_artefacts_map(image_gray, width=None, height=None, threshold=400):
     pixel_map = image_gray.load()
     
-    width  = image_gray.size[W]
-    height = image_gray.size[H]
+    if width == None and height == None:
+        width  = image_gray.size[W]
+        height = image_gray.size[H]
      
     artefacts_map = [[False] * width for i in range(height)]
     
@@ -106,24 +104,29 @@ def get_artefacts_map(image_gray):
         for y in range(1, width-1):
             area_image = get_area(pixel_map, x, y)
             r = calc_response(area_image)
-            artefacts_map[x][y] = True if abs(r) >= THRESHOLD else False
+            artefacts_map[x][y] = True if abs(r) >= threshold else False
     
     return artefacts_map
 
 # Перекрашивание битых пикселей
-def retouch(image_rgb, artefacts):
+def retouch(image_rgb, artefacts, h=None, w=None):
     pixel_map = image_rgb.load()
     
     new_img = Image.new(image_rgb.mode, image_rgb.size)
-    new_img_map = new_img.load()   
+    new_img_map = new_img.load() 
+    
     
     width  = image_rgb.size[W]
     height = image_rgb.size[H]
     
     new_img_map = copy_image_map(new_img_map, pixel_map, width, height)
     
-    for x in range(1, height-1):
-        for y in range(1, width-1):
+    if h == None and w == None:
+        h = height
+        w = width
+    
+    for x in range(1, h-1):
+        for y in range(1, w-1):
             if artefacts[x][y] == True:
                 new_img_map[x, y] = get_avg_value(pixel_map, artefacts, x, y)
 
@@ -145,7 +148,8 @@ def vertical_wv(image):
             a = (pixel_map[x, y][GRAY] + pixel_map[x+1, y][GRAY]) // 2
             d = (pixel_map[x, y][GRAY] - pixel_map[x+1, y][GRAY]) // 2
             img_wv_map[x/2, y] = (a, a, a)
-            img_wv_map[height/2 + x/2, y] = (d, d, d)
+#            img_wv_map[height/2 + x/2, y] = (d, d, d)
+            img_wv_map[height/2 + x/2, y] = (0, 0, 0)
             
     return img_wv
 
@@ -163,7 +167,8 @@ def horizontal_wv(image):
             a = (pixel_map[x, y][GRAY] + pixel_map[x, y+1][GRAY]) // 2
             d = (pixel_map[x, y][GRAY] - pixel_map[x, y+1][GRAY]) // 2
             img_wv_map[x, y/2] = (a, a, a)
-            img_wv_map[x, width/2 + y/2] = (d, d, d)
+#            img_wv_map[x, width/2 + y/2] = (d, d, d)
+            img_wv_map[x, width/2 + y/2] = (0, 0, 0)
             
     return img_wv
 
@@ -219,41 +224,79 @@ def rev_wavelet(image_wv):
 
     
 #------------------------------------------------------------------------------
+
+def one_pix():
+    # Загрузка изображения
+    img_ruined_rgb = Image.open("me_nr2.bmp")
+    
+    # Преобразование в 50 оттенков серого
+    img_ruined_gray = rgb2gray(img_ruined_rgb)
+    #
+    #img_wv = wavelet(img_ruined_gray)
+    #img_wv = rev_wavelet(img_wv)
+    #img_saved   = pil2tk_image(img_wv)
+    
+    # Рассчет откликов и формирование карты битых пикселей
+    artefacts_map = get_artefacts_map(img_ruined_gray, threshold=400)
+    
+    # Перекрашивание битых пикселей
+    img_retouch = retouch(img_ruined_rgb, artefacts_map)
+    img_retouch.save("me_saved.bmp")
+    
+    # Конвертирование для отрисовки на форме
+    img_ruined  = pil2tk_image(img_ruined_rgb)
+    img_saved   = pil2tk_image(img_retouch)  
+    
+    # Рисуем картинку слева
+    label_left = tk.Label(root, image = img_ruined)
+    label_left.image = img_ruined
+    label_left.pack()
+    label_left.place(x=0, y=0, width=512, height=512)
+    
+    # Рисуем картинку справа
+    label_right = tk.Label(root, image = img_saved)
+    label_right.image = img_saved
+    label_right.pack()
+    label_right.place(x=530, y=0, width=512, height=512)
+    
+def wv():
+    # Загрузка изображения
+    img_ruined_rgb = Image.open("me_h3.bmp")
+    
+    # Преобразование в 50 оттенков серого
+    img_ruined_gray = rgb2gray(img_ruined_rgb)
+    
+    img_wv = wavelet(img_ruined_gray)
+    #img_saved   = pil2tk_image(img_wv)
+    
+    # Рассчет откликов и формирование карты битых пикселей
+    artefacts_map = get_artefacts_map(img_wv, threshold=100)
+    
+    # Перекрашивание битых пикселей
+    img_retouch = retouch(img_wv, artefacts_map)
+#    img_retouch.save("me_saved.bmp")
+    img_wv = rev_wavelet(img_retouch)
+    img_wv.save("me_saved_wv.bmp")
+    
+    # Конвертирование для отрисовки на форме
+    img_ruined  = pil2tk_image(img_ruined_rgb)
+    img_saved   = pil2tk_image(img_wv)  
+    
+    # Рисуем картинку слева
+    label_left = tk.Label(root, image = img_ruined)
+    label_left.image = img_ruined
+    label_left.pack()
+    label_left.place(x=0, y=0, width=512, height=512)
+    
+    # Рисуем картинку справа
+    label_right = tk.Label(root, image = img_saved)
+    label_right.image = img_saved
+    label_right.pack()
+    label_right.place(x=530, y=0, width=512, height=512)
+
 root = tk.Tk()
 root.geometry("1042x650")
 
-# Загрузка изображения
-img_ruined_rgb = Image.open("me_nr3.bmp")
-
-# Преобразование в 50 оттенков серого
-img_ruined_gray = rgb2gray(img_ruined_rgb)
-
-# Рассчет откликов и формирование карты битых пикселей
-artefacts_map = get_artefacts_map(img_ruined_gray)
-
-# Перекрашивание битых пикселей
-img_retouch = retouch(img_ruined_rgb, artefacts_map)
-img_retouch.save("me_saved.bmp")
-
-# Конвертирование для отрисовки на форме
-img_ruined  = pil2tk_image(img_ruined_rgb)
-img_saved   = pil2tk_image(img_retouch)
-
-
-img_wv = wavelet(img_ruined_gray)
-img_wv = rev_wavelet(img_wv)
-img_saved   = pil2tk_image(img_wv)
-
-# Рисуем картинку слева
-label_left = tk.Label(root, image = img_ruined)
-label_left.image = img_ruined
-label_left.pack()
-label_left.place(x=0, y=0, width=512, height=512)
-
-# Рисуем картинку справа
-label_right = tk.Label(root, image = img_saved)
-label_right.image = img_saved
-label_right.pack()
-label_right.place(x=530, y=0, width=512, height=512)
-
+one_pix()
+# wv()
 root.mainloop()
