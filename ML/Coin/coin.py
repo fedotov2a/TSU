@@ -2,13 +2,12 @@ import matplotlib.pyplot as plt
 
 limit = 100
 p = 0.25
+eps = 1e-07
 
 optimal_function = [0 for i in range(limit+1)]
 optimal_strategy = [0 for i in range(limit-1)]
-eps = 1e-07
 
 end = False
-
 while not end:
 	for m in range(limit-1, 0, -1):
 		max_bet = m
