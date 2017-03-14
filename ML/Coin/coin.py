@@ -2,17 +2,17 @@
 import matplotlib.pyplot as plt
 
 limit = 100     # деньги игрока
-p = 0.25        # вероятность выпадения орла (вероятность выигрыша)
+p = 0.55        # вероятность выпадения орла (вероятность выигрыша)
 eps = 1e-07
 
 optimal_function = [0 for i in range(limit+1)]      # вероятность выигрыша, имея i-ый капитал
 optimal_strategy = [0 for i in range(limit-1)]      # оптимальный размер ставки, в зависимости от i-го капитала
 
-end = False
-while not end:
+win = False
+while not win:
     for m in range(limit-1, 0, -1):
         max_bet = m
-        max_bet = (limit - m) if max_bet > (limit - m) else max_bet
+        max_bet = min(m, limit-m)
 
         Vmax = 0
         for bet in range(1, max_bet+1):
@@ -28,12 +28,12 @@ while not end:
 
         if m == limit-1 and abs(Vmax - optimal_function[m]) < eps:
             optimal_function[m] = Vmax
-            end = True
+            win = True
 
         optimal_function[m] = Vmax
 
 for i in range(limit-1):
-    print("money: {} | p_win: {:.2f} | opt_str: {}".format(i+1, optimal_function[i+1], optimal_strategy[i]))
+    print("money: {} | p_win: {:.4f} | opt_str: {}".format(i+1, optimal_function[i+1], optimal_strategy[i]))
 
 plt.figure(1)
 plt.subplot(211)
