@@ -5,7 +5,7 @@ limit = 100     # деньги игрока
 p = 0.55        # вероятность выпадения орла (вероятность выигрыша)
 eps = 1e-07
 
-optimal_function = [0 for i in range(limit+1)]      # вероятность выигрыша, имея i-ый капитал
+optimal_function = [0 for i in range(limit+1)]      # оптимальная функция ценности действия
 optimal_strategy = [0 for i in range(limit-1)]      # оптимальный размер ставки, в зависимости от i-го капитала
 
 win = False
