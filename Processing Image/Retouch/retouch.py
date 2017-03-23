@@ -91,15 +91,18 @@ def get_avg_value(pixel_map, artefacts, x, y):
 #------------------------------------------------------------------------------
 
 # Определение битых пикселей
-def get_artefacts_map(image_gray, width=None, height=None, threshold=400):
+def get_artefacts_map(image_gray, wv=False, threshold=400):
     pixel_map = image_gray.load()
     
-    if width == None and height == None:
-        width  = image_gray.size[W]
-        height = image_gray.size[H]
+    width  = image_gray.size[W]
+    height = image_gray.size[H]
      
     artefacts_map = [[False] * width for i in range(height)]
-    
+
+    if wv == True:
+        width  = image_gray.size[W] // 2
+        height = image_gray.size[H] // 2
+
     for x in range(1, height-1):
         for y in range(1, width-1):
             area_image = get_area(pixel_map, x, y)
@@ -115,7 +118,6 @@ def retouch(image_rgb, artefacts, h=None, w=None):
     new_img = Image.new(image_rgb.mode, image_rgb.size)
     new_img_map = new_img.load() 
     
-    
     width  = image_rgb.size[W]
     height = image_rgb.size[H]
     
@@ -129,6 +131,27 @@ def retouch(image_rgb, artefacts, h=None, w=None):
         for y in range(1, w-1):
             if artefacts[x][y] == True:
                 new_img_map[x, y] = get_avg_value(pixel_map, artefacts, x, y)
+
+    return new_img
+
+def retouch_wv(image_wv, artefacts):
+    pixel_map = image_wv.load()
+    
+    new_img = Image.new(image_wv.mode, image_wv.size)
+    new_img_map = new_img.load() 
+    
+    width  = image_wv.size[W]
+    height = image_wv.size[H]
+    
+    new_img_map = copy_image_map(new_img_map, pixel_map, width, height)
+    
+    for x in range(1, height//2 - 1):
+        for y in range(1, width//2 - 1):
+            if artefacts[x][y] == True:
+                new_img_map[x, y] = get_avg_value(pixel_map, artefacts, x, y)
+                new_img_map[x, y + width//2]  = (0, 0, 0)
+                new_img_map[x + height//2, y] = (0, 0, 0)
+                new_img_map[x + height//2, y + width//2] = (0, 0, 0)
 
     return new_img
 
@@ -148,8 +171,8 @@ def vertical_wv(image):
             a = (pixel_map[x, y][GRAY] + pixel_map[x+1, y][GRAY]) // 2
             d = (pixel_map[x, y][GRAY] - pixel_map[x+1, y][GRAY]) // 2
             img_wv_map[x/2, y] = (a, a, a)
-#            img_wv_map[height/2 + x/2, y] = (d, d, d)
-            img_wv_map[height/2 + x/2, y] = (0, 0, 0)
+            img_wv_map[height/2 + x/2, y] = (d, d, d)
+            # img_wv_map[height/2 + x/2, y] = (0, 0, 0)
             
     return img_wv
 
@@ -167,8 +190,8 @@ def horizontal_wv(image):
             a = (pixel_map[x, y][GRAY] + pixel_map[x, y+1][GRAY]) // 2
             d = (pixel_map[x, y][GRAY] - pixel_map[x, y+1][GRAY]) // 2
             img_wv_map[x, y/2] = (a, a, a)
-#            img_wv_map[x, width/2 + y/2] = (d, d, d)
-            img_wv_map[x, width/2 + y/2] = (0, 0, 0)
+            img_wv_map[x, width/2 + y/2] = (d, d, d)
+            # img_wv_map[x, width/2 + y/2] = (0, 0, 0)
             
     return img_wv
 
@@ -222,7 +245,6 @@ def rev_wavelet(image_wv):
     img_rev_wv = vertical_rev_wv(horizontal_rev_wv(image_wv))
     return img_rev_wv
 
-    
 #------------------------------------------------------------------------------
 
 def one_pix():
@@ -270,13 +292,15 @@ def wv():
     #img_saved   = pil2tk_image(img_wv)
     
     # Рассчет откликов и формирование карты битых пикселей
-    artefacts_map = get_artefacts_map(img_wv, threshold=100)
+    artefacts_map = get_artefacts_map(img_wv, wv=True)
     
     # Перекрашивание битых пикселей
-    img_retouch = retouch(img_wv, artefacts_map)
-#    img_retouch.save("me_saved.bmp")
+    img_retouch = retouch_wv(img_wv, artefacts_map)
     img_wv = rev_wavelet(img_retouch)
-    img_wv.save("me_saved_wv.bmp")
+
+    artefacts_map = get_artefacts_map(img_wv)
+    img_wv = retouch(img_wv, artefacts_map)
+    img_wv.save("me_saved.bmp")
     
     # Конвертирование для отрисовки на форме
     img_ruined  = pil2tk_image(img_ruined_rgb)
@@ -297,6 +321,5 @@ def wv():
 root = tk.Tk()
 root.geometry("1042x650")
 
-one_pix()
-# wv()
+wv()
 root.mainloop()
