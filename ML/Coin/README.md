@@ -1,5 +1,3 @@
-Screenshots:
-
 ![alt tag](https://raw.githubusercontent.com/fedotov2a/TSU/master/ML/Coin/p_025.jpg)
 
 
