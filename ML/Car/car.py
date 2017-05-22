@@ -54,7 +54,7 @@ def init():
 
 def render_plot(pos, vel, a, episode, step):
     global frame
-    if not frame % 10:
+    if not frame % 5:
         plt.clf()
         plt.title('Episode: {} | Step: {}\na = {} \npos = {:.5f} | vel = {:.5f}'
                   .format(episode, step, ['L ←', 'R →', 'N -'][a+1], pos, vel))
