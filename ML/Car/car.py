@@ -1,115 +1,130 @@
 # -*- coding: utf-8 -*-
-import math
-import matplotlib.pyplot as plt
-from pylab import *
+from pylab import plt, np
+from pylab import random, randint, choice
+from pylab import sin, cos, pi
+from pylab import argmax
 
-numTiles = 10 * 9 * 9
-numTilings = 10
+# ограничение расстояния
+pos_left  = -1.2
+pos_right =  0.5
 
-tilingSize = 8 # (subset)
-positionTileMovementValue = -0.2125/numTilings
-velocityTileMovementValue = -0.0175/numTilings
+# ограничение скорости
+vel_left  = -0.07
+vel_right =  0.07
 
-numEpisodes = 30
-alpha = 0.05
-lmbda = 0.9
-n = numTiles * 3
-F = [-1]*numTilings
+# сетки
+number_grids   = 10
+tile_side_size = 9
+num_tiles      = number_grids * tile_side_size * tile_side_size
 
-t = np.arange(-1.2, 0.5, 0.01)
-k = 0
+# шаг сетки
+tile_width  = (pos_right - pos_left) / (tile_side_size - 1)
+tile_height = (vel_right - vel_left) / (tile_side_size - 1)
 
+shift_pos = tile_width / number_grids
+shift_vel = tile_height / number_grids
+
+episodes   = 30
+alpha      = 0.05
+lmbda      = 0.9
+num_action = 3
+n          = num_tiles * num_action
+
+# для отрисовки
+t = np.arange(pos_left, pos_right, 0.01)
+frame = 0
 plt.show(block=False)
 
-def tilecode(x, y, tileIndices):
-    x += 1.2
-    y += 0.07
+def get_F(x, y):
+    x -= pos_left
+    y -= vel_left
 
-    for i in range (numTilings):
-        positionMovementConstant = i * positionTileMovementValue
-        velocityMovementConstant = i * velocityTileMovementValue
-        
-        xcoord = int(tilingSize * (x - positionMovementConstant)/1.7)
-        ycoord = int(tilingSize * (y - velocityMovementConstant)/0.14)
+    F = [-1] * number_grids
+    for i in range(number_grids):
+        x_res = int((tile_side_size - 1) * (x + i * shift_pos) / (pos_right - pos_left))
+        y_res = int((tile_side_size - 1) * (y + i * shift_vel) / (vel_right - vel_left))
+        F[i]  = i * tile_side_size**2 + (y_res * tile_side_size + x_res)
 
-        tileIndices[i] = i * 81 + (ycoord * 9 + xcoord)
+    return F
 
 def init():
-    position = -0.5 + random() * 0.2
-    return position, 0.0
+    pos = -0.5 + 0.2 * random() * choice([-1, 1])
+    vel =  0.0
+    return pos, vel
 
-def render_plot(position):
-    global k
-    if not k % 10:
+def render_plot(pos, vel, a, episode, step):
+    global frame
+    if not frame % 10:
         plt.clf()
+        plt.title('Episode: {} | Step: {}\na = {} \npos = {:.5f} | vel = {:.5f}'
+                  .format(episode, step, ['L ←', 'R →', 'N -'][a+1], pos, vel))
         plt.plot(t, sin(pi*t))
-        plt.axvline(x=-1.2)
-        plt.axvline(x=0.5)
-        plt.scatter(position, sin(pi*position))
+        plt.axvline(x=pos_left)
+        plt.axvline(x=pos_right)
+        plt.scatter(pos, sin(pi*pos))
         plt.draw()
         plt.pause(0.0001)
-        k = 0
-    k += 1
+        frame = 0
+    frame += 1
 
-def update(S, A):
-    position, velocity = S
-        
-    R = -1
-    A -= 1
+# обновление позиции и скорости
+def update(S, a, episode, step):
+    pos, vel = S
+    r = -1
+    a -= 1
 
-    velocity += 0.001 * A - 0.0025 * cos(3 * position)
-    velocity = max(min(velocity, 0.07), -0.07)
+    vel += 0.001 * a - 0.0025 * cos(3 * pos)
+    vel = max(min(vel, vel_right), vel_left)
+    pos += vel
 
-    position += velocity
+    if pos >= pos_right:
+        return r, None
 
-    if position >= 0.5:
-        return R, None
+    if pos < pos_left:
+        pos = -1.2
+        vel =  0.0
 
-    if position < -1.2:
-        position = -1.2
-        velocity = 0.0
+    render_plot(pos, vel, a, episode, step)
+    return r, (pos, vel)
 
-    render_plot(position)
-    return R, (position, velocity)
-
+# eps-жадный выбор
 def eps_greedy(Qs, epsilon=0):
-    return randint(3) if random() < epsilon else argmax(Qs)
-    
+    return randint(num_action) if random() < epsilon else argmax(Qs)
+
+# обновление функции ценности действия
 def Qs(F):
-    Q = np.zeros(3)
-    for a in range(3):
-        for i in F:
-            Q[a] += theta[i + (a * numTiles)]     # update Qa
+    Q = np.zeros(num_action)
+    for a in range(num_action):
+        for f in F:
+            Q[a] += theta[f + (a * num_tiles)]
     return Q
 
-theta = -0.01 * random(n)
-for episode in range(numEpisodes):
+# Sarsa(lambda)
+theta = random(n)                            # theta - случайные значения
+for episode in range(episodes):
     step = 0
-    S = init()                               # initialize state
-    e = np.zeros(n)                          # initialize e (eligibility trace vector)
+    S = init()                               # начальное состояние. S[0] - позиция, S[1] - скорость
+    e = np.zeros(n)                          # след
     
-    while S is not None:
-        print("Episode: {}, Step: {}".format(episode, step))
+    while S is not None:                     # пока S не терминальное состояние
+        action = 0
+        F = get_F(S[0], S[1])
 
-        A = 0
-        tilecode(S[0], S[1], F)              # get a list of four tile indices
-
-        Q = Qs(F)
-        A = eps_greedy(Q)                    # pick the action
-        R, S_next = update(S, A)             # observe reward, and next state
-        delta = R - Q[A]
+        Q         = Qs(F)
+        action    = eps_greedy(Q)                        # выбор действия
+        R, S_next = update(S, action, episode, step)     # подкрепление и текущее состояние
+        delta     = R - Q[action]
         
-        for i in F:
-            e[i + (A * numTiles)] = 1          # replacing traces
+        for f in F:
+            e[f + (action * num_tiles)] = 1              # отметить состояния, в которые попадали
         
-        # if S is terminal, then update theta; go to next episode
-        if S_next == None:
+        if S_next == None:                               # Если S_next терминальное, завершаем эпизод
             theta += alpha * delta * e
             break
         
-        tilecode(S_next[0], S_next[1], F)
+        F = get_F(S_next[0], S_next[1])
         delta += max(Qs(F))
-        theta += alpha * delta * e           # update theta
-        e *= lmbda                           # update e
-        S = S_next                           # update current state to next state for next iteration
-        step += 1
+        theta += alpha * delta * e
+        e     *= lmbda
+        S      = S_next
+        step  += 1
