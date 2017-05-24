@@ -78,7 +78,7 @@ def update(S, a, episode, step):
     pos += vel
 
     if pos >= pos_right:
-        return r, None
+        return 0, None
 
     if pos < pos_left:
         pos = -1.2
@@ -112,7 +112,7 @@ for episode in range(episodes):
 
         Q         = Qs(F)
         action    = eps_greedy(Q)                        # выбор действия
-        R, S_next = update(S, action, episode, step)     # подкрепление и текущее состояние
+        R, S_next = update(S, action, episode, step)     # подкрепление и следующее состояние
         delta     = R - Q[action]
         
         for f in F:
