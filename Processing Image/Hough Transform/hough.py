@@ -78,35 +78,35 @@ for _, angle, dist in zip(*hough_line_peaks(h, theta, d)):
             if np.sqrt((x - x_wp)**2 + (yy - y_wp)**2) >= 45:
                 ax2.plot((x_wp, x), (y_wp, yy), '-k', linewidth=3)
 
+    # удаление линий внутри фигур типа "звезда"
+    fp = True
+    for x in range(min(p0[0], p1[0]), max(p0[0], p1[0])):
+        y_x = int(round((dist - x*np.cos(angle)) / np.sin(angle)))
+        if fp:
+            xx = x
+            yy = y_x
+            fp = False
+            continue
 
-    # fp = True
-    # for x in range(min(p0[0], p1[0]), max(p0[0], p1[0])):
-    #     y_x = int(round((dist - x*np.cos(angle)) / np.sin(angle)))
-    #     if fp:
-    #         xx = x
-    #         yy = y_x
-    #         fp = False
-    #         continue
+        wh_p = False
+        for i in range(-2, 3):
+            for j in range(-2, 3):
+                if image[y_x+i][x+j] == 255 and y_x + i != yy and x + j != xx:
+                    xx, yy = x+j, y_x+i
+                    wh_p = True
+                    break
+            if wh_p:
+                break
 
-    #     wh_p = False
-    #     for i in range(-2, 3):
-    #         for j in range(-2, 3):
-    #             if image[y_x+i][x+j] == 255 and y_x + i != yy and x + j != xx:
-    #                 xx, yy = x+j, y_x+i
-    #                 wh_p = True
-    #                 break
-    #         if wh_p:
-    #             break
-
-    #     if wh_p:
-    #         if np.sqrt((x - xx)**2 + (y_x - yy)**2) <= 10:
-    #             ax2.plot((xx, x), (yy, y_x), '-r', linewidth=3)
+        if wh_p:
+            if np.sqrt((x - xx)**2 + (y_x - yy)**2) <= 10:
+                ax2.plot((xx, x), (yy, y_x), '-r', linewidth=3)
    
-    #         xx = x
-    #         yy = y_x
+            xx = x
+            yy = y_x
 
-    # ax2.plot((0, col1), (y0, y1), '-r', linewidth=2)
-    # ax2.plot((p0[0], p1[0]), (p0[1], p1[1]), '-r', linewidth=3)
+    ax2.plot((0, col1), (y0, y1), '-r', linewidth=2)
+    ax2.plot((p0[0], p1[0]), (p0[1], p1[1]), '-r', linewidth=3)
 
 ax2.axis((0, col1, row1, 0))
 ax2.set_title('Detected lines')
