@@ -100,9 +100,9 @@ def p8_1():
     iv = 9
     data = read_write_file.read_data_1byte('data/f5.bmp')
     ecb_e = em.ecb_e(data[50:], key, crypto_mode='caesar')
-    ofb_e = em.ofb_e(data[50:], key, iv, crypto_mode='caesar')
+    cfb_e = em.cfb_e(data[50:], key, iv, crypto_mode='caesar')
     read_write_file.write_data_1byte('encrypt_data/f5_ecb_c_e_50.bmp', data[:50] + ecb_e)
-    read_write_file.write_data_1byte('encrypt_data/f5_ofb_c_e_50.bmp', data[:50] + ofb_e)
+    read_write_file.write_data_1byte('encrypt_data/f5_cfb_c_e_50.bmp', data[:50] + cfb_e)
 
 def p9():
     key = 223
@@ -165,11 +165,11 @@ def p13():
     read_write_file.write_data_1byte('encrypt_data/im5_vigener_cfb_c_all_50.bmp', data[:50] + cfb_e)
 
 def p14():
-    data = read_write_file.read_data_1byte('encrypt_data/im6_vigener_ctr_c.bmp')
+    data = read_write_file.read_data_1byte('encrypt_data/im6_vigener_ctr_c_all.bmp')
     key = 'MONOLITH'
     iv = 167
-    ctr_d = em.ctr_d(data[50:], key, iv, crypto_mode='vigener') # ?
-    read_write_file.write_data_1byte('decrypt_data/im6_vigener_ctr_c_decrypt.bmp', data[:50] + ctr_d)
+    ctr_d = em.ctr_d(data, key, iv, crypto_mode='vigener')
+    read_write_file.write_data_1byte('decrypt_data/im6_vigener_ctr_c_decrypt.bmp', ctr_d)
     
     data = read_write_file.read_data_1byte('decrypt_data/im6_vigener_ctr_c_decrypt.bmp')
     ctr_e = em.ctr_e(data[50:], key, iv, crypto_mode='vigener')
@@ -228,19 +228,35 @@ def p18():
     read_write_file.write_data_1byte('decrypt_data/f8_ctr_a_e_50_decrypt.bmp', data[:50] + ctr_d)
 
 def p19():
-    x = int('0010011010110111', 2)
-    rounds = 4
-    k = int('00111010100101001101011000111111', 2)
-    rk = spn.round_keys(k)
-    print('k= ', spn.binary(k, 16))
-    print('k1= ', spn.binary(rk[0], 4))
-    print('k2= ', spn.binary(rk[1], 4))
-    print('k3= ', spn.binary(rk[2], 4))
-    print('k4= ', spn.binary(rk[3], 4))
-    print('k5= ', spn.binary(rk[4], 4))
-    y = spn.encrypt(x, rk, rounds)
-    print('y= ', spn.binary(y, 4))
-    k = int('00111010100101001101011000111111', 2)
-    spn.round_keys_to_decrypt(k)
+    # x = int('0010011010110111', 2)
+    # # x = int('0011111001110111', 2)
+    # rounds = 4
+    # k = int('00111010100101001101011000111111', 2)
+    # rk = spn.round_keys(k)
+    # lk = spn.round_keys_to_decrypt(k)
+    # print(rk)
+    # print(lk)
+    # for i in range(len(rk)):
+    #     print(spn.binary(rk[i], 16), spn.binary(lk[i], 16))
+    # print(x)
+    # e = spn.encrypt(x, rk, rounds)
+    # print(e)
+    # d = spn.decrypt(e, lk, rounds)
+    # print(d)
 
-p19()
+    key = int('00111010100101001101011000111111', 2)
+    rounds = 4
+    data = read_write_file.read_data_2byte('data/f0.bmp')
+    e = spn.encrypt_data(data, key, rounds)
+    d = spn.decrypt_data(e, key, rounds)
+    read_write_file.write_data_2byte('decrypt_data/f0_spn_d.bmp', d)
+
+def p20():
+    data = read_write_file.read_data_2byte('encrypt_data/d5_spn_c_all.bmp')
+    key = 34523456231
+    rounds = 4
+    spn_d = spn.decrypt_data(data, key, rounds)
+    spn_e = spn.encrypt_data(spn_d[500:], key, rounds)
+    read_write_file.write_data_2byte('decrypt_data/d5_spn_c_all_500.bmp', spn_d[:500] + spn_e)
+
+p20()
