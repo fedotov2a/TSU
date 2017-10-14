@@ -32,13 +32,13 @@ def pbox(x):
     return y
 
 def asbox(x):
-    return s.index(x)
+    return self.s.index(x)
 
-def apbox(x):
+def apbox(self, x):
     y = 0
-    for i in range(len(p)):
-        if x & (1 << i) != 0:
-            y ^= (1 << p.index(i))
+    for i in range(len(self.p)):
+        if (x & (1 << self.p[i])) != 0:
+            y ^= (1 << i)
     return y
 #--------------------------------------------
 
