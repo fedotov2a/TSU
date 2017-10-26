@@ -4,4 +4,4 @@
 3. Cryptography [3 sem]
 4. Machine Learning [2 sem]
 5. Parallel and distributed programming [1 sem]
-6. Proccessing image [2 sem]
+6. Proccessing image [2 sem] - скорее всего эти задачи не актуальны
