@@ -1,4 +1,4 @@
-# TSU
+# TSU master course
 1. Algorithmic basics of multimedia technologies (Processing Signals) [1 sem]
 2. Analysis of fuzzy information systems [3 sem]
 3. Cryptography [3 sem]
