@@ -69,7 +69,6 @@ def cyclic_group(n):
     return None
 
 #-----------------------------------------------------------------------------------------------
-# it does not work?
 def pow_right_left(a, x, p):
     '''
     Возведение в степень справа-налево
@@ -79,13 +78,12 @@ def pow_right_left(a, x, p):
     y = 1
     s = a
     xb = bin(x)[2:]             # xb = (x_t, x_t-1, ..., x_0) binary
-    for i in range(len(xb)):
+    for i in range(len(xb)-1, -1, -1):
         if int(xb[i]) == 1:
             y = (y * s) % p
         s = (s**2) % p
     return y
 
-# and it does not work?
 def pow_left_right(a, x, p):
     '''
     Возведение в степень слева-направо
@@ -94,16 +92,15 @@ def pow_left_right(a, x, p):
     '''
     y = 1
     xb = bin(x)[2:]
-    for i in range(len(xb)-1, -1, -1):
+    for i in range(len(xb)):
         y = (y**2) % p
         if int(xb[i]) == 1:
             y = (y * a) % p
     return y
 
-# but it works...... WHY???
 def pow_(a, x, p):
     '''
-    Возведение в степень ???
+    Возведение в степень слева-направо
     Вход: a, x, p - целые числа
     Выход: y = a**x mod p
     '''
