@@ -346,7 +346,7 @@ def elgamal_decrypt(x, p, c1, c2):
     '''
     x = private key
     p = prime
-    (с1 ,с2) = ciphertext
+    (c1 ,c2) = ciphertext
     '''
     return (get_inverse_ltf(pow_(c1, x, p), p) * c2) % p
 
