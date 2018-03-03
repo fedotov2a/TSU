@@ -12,13 +12,13 @@ from time import sleep
 from mpl_toolkits.mplot3d import Axes3D
 
 class VideoAnalyzer:
-    break_frame = 300
+    break_frame = 800
     RED = 0             # Красная компонента в изображении,
                         # представленном массивом: image[row][pix][color]
                         # или 
                         # [[[RED, G, B], [RED, G, B] ... ], ..., [[RED, G, B], [RED, G, B] ...]]
     
-    THRESHOLD = 250     # Порог бинаризации
+    THRESHOLD = 150     # Порог бинаризации
 
     # Изображение представляется массивом image[row][pix][color]
     # Последовательность изображений: vid = [image_1, ..., image_N]
@@ -199,41 +199,41 @@ class VideoAnalyzer:
 
     def __init__(self):
         # v.avi
-        self.support_area_top['top_left_point']['x'] = 208
-        self.support_area_top['top_left_point']['y'] = 57
-        self.support_area_top['top_right_point']['x'] = 392
-        self.support_area_top['top_right_point']['y'] = 65
-        self.support_area_top['bottom_left_point']['x'] = 203
-        self.support_area_top['bottom_left_point']['y'] = 97
-        self.support_area_top['bottom_right_point']['x'] = 381
-        self.support_area_top['bottom_right_point']['y'] = 102
+        # self.support_area_top['top_left_point']['x'] = 208
+        # self.support_area_top['top_left_point']['y'] = 57
+        # self.support_area_top['top_right_point']['x'] = 392
+        # self.support_area_top['top_right_point']['y'] = 65
+        # self.support_area_top['bottom_left_point']['x'] = 203
+        # self.support_area_top['bottom_left_point']['y'] = 97
+        # self.support_area_top['bottom_right_point']['x'] = 381
+        # self.support_area_top['bottom_right_point']['y'] = 102
 
-        self.support_area_bottom['top_left_point']['x'] = 208
-        self.support_area_bottom['top_left_point']['y'] = 341
-        self.support_area_bottom['top_right_point']['x'] = 385
-        self.support_area_bottom['top_right_point']['y'] = 327
-        self.support_area_bottom['bottom_left_point']['x'] = 216
-        self.support_area_bottom['bottom_left_point']['y'] = 381
-        self.support_area_bottom['bottom_right_point']['x'] = 398
-        self.support_area_bottom['bottom_right_point']['y'] = 363
+        # self.support_area_bottom['top_left_point']['x'] = 208
+        # self.support_area_bottom['top_left_point']['y'] = 341
+        # self.support_area_bottom['top_right_point']['x'] = 385
+        # self.support_area_bottom['top_right_point']['y'] = 327
+        # self.support_area_bottom['bottom_left_point']['x'] = 216
+        # self.support_area_bottom['bottom_left_point']['y'] = 381
+        # self.support_area_bottom['bottom_right_point']['x'] = 398
+        # self.support_area_bottom['bottom_right_point']['y'] = 363
         
-        self.support_area_left['top_left_point']['x'] = 146
-        self.support_area_left['top_left_point']['y'] = 116
-        self.support_area_left['top_right_point']['x'] = 180
-        self.support_area_left['top_right_point']['y'] = 120
-        self.support_area_left['bottom_left_point']['x'] = 154
-        self.support_area_left['bottom_left_point']['y'] = 321
-        self.support_area_left['bottom_right_point']['x'] = 184
-        self.support_area_left['bottom_right_point']['y'] = 314
+        # self.support_area_left['top_left_point']['x'] = 146
+        # self.support_area_left['top_left_point']['y'] = 116
+        # self.support_area_left['top_right_point']['x'] = 180
+        # self.support_area_left['top_right_point']['y'] = 120
+        # self.support_area_left['bottom_left_point']['x'] = 154
+        # self.support_area_left['bottom_left_point']['y'] = 321
+        # self.support_area_left['bottom_right_point']['x'] = 184
+        # self.support_area_left['bottom_right_point']['y'] = 314
 
-        self.support_area_right['top_left_point']['x'] = 402
-        self.support_area_right['top_left_point']['y'] = 126
-        self.support_area_right['top_right_point']['x'] = 445
-        self.support_area_right['top_right_point']['y'] = 122
-        self.support_area_right['bottom_left_point']['x'] = 406
-        self.support_area_right['bottom_left_point']['y'] = 305
-        self.support_area_right['bottom_right_point']['x'] = 450
-        self.support_area_right['bottom_right_point']['y'] = 305
+        # self.support_area_right['top_left_point']['x'] = 402
+        # self.support_area_right['top_left_point']['y'] = 126
+        # self.support_area_right['top_right_point']['x'] = 445
+        # self.support_area_right['top_right_point']['y'] = 122
+        # self.support_area_right['bottom_left_point']['x'] = 406
+        # self.support_area_right['bottom_left_point']['y'] = 305
+        # self.support_area_right['bottom_right_point']['x'] = 450
+        # self.support_area_right['bottom_right_point']['y'] = 305
 
         # v3.avi
         # self.support_area_top['top_left_point']['x'] = 229
@@ -272,6 +272,43 @@ class VideoAnalyzer:
         # self.support_area_right['bottom_right_point']['x'] = 522
         # self.support_area_right['bottom_right_point']['y'] = 341
 
+        # scan1.avi
+        self.support_area_top['top_left_point']['x'] = 185
+        self.support_area_top['top_left_point']['y'] = 96
+        self.support_area_top['top_right_point']['x'] = 379
+        self.support_area_top['top_right_point']['y'] = 92
+        self.support_area_top['bottom_left_point']['x'] = 193
+        self.support_area_top['bottom_left_point']['y'] = 141
+        self.support_area_top['bottom_right_point']['x'] = 376
+        self.support_area_top['bottom_right_point']['y'] = 138
+
+        self.support_area_bottom['top_left_point']['x'] = 193
+        self.support_area_bottom['top_left_point']['y'] = 380
+        self.support_area_bottom['top_right_point']['x'] = 392
+        self.support_area_bottom['top_right_point']['y'] = 369
+        self.support_area_bottom['bottom_left_point']['x'] = 185
+        self.support_area_bottom['bottom_left_point']['y'] = 424
+        self.support_area_bottom['bottom_right_point']['x'] = 402
+        self.support_area_bottom['bottom_right_point']['y'] = 413
+        
+        self.support_area_left['top_left_point']['x'] = 121
+        self.support_area_left['top_left_point']['y'] = 153
+        self.support_area_left['top_right_point']['x'] = 168
+        self.support_area_left['top_right_point']['y'] = 164
+        self.support_area_left['bottom_left_point']['x'] = 118
+        self.support_area_left['bottom_left_point']['y'] = 359
+        self.support_area_left['bottom_right_point']['x'] = 166
+        self.support_area_left['bottom_right_point']['y'] = 354
+
+        self.support_area_right['top_left_point']['x'] = 401
+        self.support_area_right['top_left_point']['y'] = 161
+        self.support_area_right['top_right_point']['x'] = 441
+        self.support_area_right['top_right_point']['y'] = 149
+        self.support_area_right['bottom_left_point']['x'] = 415
+        self.support_area_right['bottom_left_point']['y'] = 346
+        self.support_area_right['bottom_right_point']['x'] = 459
+        self.support_area_right['bottom_right_point']['y'] = 344
+
         for key_area, sa in self.support_areas.items():
             for key_point, xy in sa.items():
                 x, y = self.to_other_coordinates_2d(xy['x'], xy['y'])
@@ -302,7 +339,7 @@ class VideoAnalyzer:
         '''
         Скелетизация каждого кадра.
         '''
-        print('Skeletonization...')
+        # print('Skeletonization...')
         for i, frame in enumerate(self.vid_src):
             if i == self.break_frame:
                 break
@@ -524,10 +561,10 @@ class VideoAnalyzer:
             v2 = p1 - p3
 
             # Вектор нормали плоскости
-            cp = np.cross(v1, v2)
-            a, b, c = cp
+            nv = np.cross(v1, v2)
+            a, b, c = nv
 
-            d = -np.dot(cp, p3)
+            d = -np.dot(nv, p3)
 
             self.coeff_support_planes[key_area]['A'] = a
             self.coeff_support_planes[key_area]['B'] = b
@@ -688,17 +725,17 @@ class VideoAnalyzer:
         v2 = p1 - p3
 
         # Вектор нормали плоскости
-        cp = np.cross(v1, v2)
-        a, b, c = cp
+        nv = np.cross(v1, v2)
+        a, b, c = nv
 
-        d = -np.dot(cp, p3)
+        d = -np.dot(nv, p3)
 
         self.coeff_laser_plane['A'] = a
         self.coeff_laser_plane['B'] = b
         self.coeff_laser_plane['C'] = c
         self.coeff_laser_plane['D'] = d
 
-        print('Laser plane:', a, b, c, d)
+        print('Laser plane:', round(a, 3), round(b, 3), round(c, 3), round(d, 3))
 
     def get_3d_points_of_surface(self, num_frame):
         '''
@@ -811,39 +848,20 @@ class VideoAnalyzer:
             self.find_laser_plane(laser_points_3d)
             self.get_3d_points_of_surface(num_frame)
 
-            #---
-            # if num_frame % 50 == 0:
-            #     a = self.coeff_laser_plane['A']
-            #     b = self.coeff_laser_plane['B']
-            #     c = self.coeff_laser_plane['C']
-            #     d = self.coeff_laser_plane['D']
-
-            #     xl = np.linspace(-100, 100, 1000)
-            #     yl = np.linspace(-100, 100, 1000)
-            #     x__, y__ = np.meshgrid(xl, yl)
-            #     z__ = (-d - b * y__ - a * x__) / c
-
-            #     self.fig2.clf()
-            #     ax2 = plt.axes(projection = '3d')
-            #     ax2.plot_surface(x__, y__, z__)
-
-            #     plt.draw()
-            #     plt.pause(0.0001)
-            #---
-
-            # print(self.coeff_laser_plane)
-
             img = plt.imshow(im, animated=True)
             self.ims.append([img])
 
     def run(self):
-        self.open_vid(filename = 'v.avi')
+        self.open_vid(filename = 'scan1.mp4')
         self.get_vid_skeleton()
 
-        print(self.instrict_parameters_of_camera)
+        print('Instrict parameters of camera:')
+        print([round(x, 3) for x in self.instrict_parameters_of_camera[0:4]])
+        print([round(x, 3) for x in self.instrict_parameters_of_camera[4:8]])
+        print([round(x, 3) for x in self.instrict_parameters_of_camera[8:12]])
 
         for i, frame in enumerate(self.vid_src):
-            if not i % 100:
+            if not i % 20:
                 print(i)
 
             if i == self.break_frame:
