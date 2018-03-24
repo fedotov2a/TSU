@@ -1,83 +1,49 @@
 # -*- coding: utf-8 -*-
 
-from tkinter import *
-from tkinter import filedialog
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QLabel, QSpinBox, QMenuBar, QMenu, QAction, QPushButton, QStatusBar
+from PyQt5.QtGui import QPainter, QPixmap, QPen, QColor, QMouseEvent
+from PyQt5.QtCore import Qt, QRect
+from PyQt5 import uic
 
-from PIL import Image, ImageTk
+class GUI(QMainWindow):
+    '''
+    Графический интерфейс для VideoAnalyzer
+    '''
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('ui/mainwindow.ui', self)
+        
+        self.move(70, 70)
+        self.setFixedSize(1200, 680)
 
-class GUI:
-    def __init__(self, root):
-        self.root = root
-        self.root.title('Laser surface scanner')
-        self.root.geometry('1000x600')
-        self.root.resizable(width = False, height = False)
+        self.COUNT_POINTS = 16
+        self.curr_count_points = 0
+        self.canvas_lbl.mousePressEvent = self.get_pos
 
-        self.canvas = Canvas(root, width = 640, height = 480)
-        self.canvas.pack()
-        self.canvas.place(x = 1000-640)
-        self.canvas.bind("<Button-1>", self.click_on_canvas)
-
-        self.open_btn = Button(root)
-        self.open_btn.place(x = 10, y = 10, width = 70, height = 40)
-        self.open_btn.configure(text = 'Open')
-        self.open_btn.bind('<Button-1>', self.open_video)
-
-        self.start_scan_btn = Button(root)
-        self.start_scan_btn.place(x = 90, y = 10, width = 70, height = 40)
-        self.start_scan_btn.configure(text = 'Start scan')
-        self.start_scan_btn.bind('<Button-1>', self.start_scan)
-
-        self.instruct_lbl = Label(root)
-        self.instruct_lbl.place(x = 5, y = 100, height=300, width=200)
-        self.instruct_lbl.configure(text = 
-        '''Instructions:
-        1. Open video file
-        2. Define points on top area
-            2.1. Top left point
-            2.2. Top right point
-            2.3. Bottom left point
-            2.4. Bottom right point
-        3. Define points on bottom area
-            3.1. Top left point
-            3.2. Top right point
-            3.3. Bottom left point
-            3.4. Bottom right point
-        4. Define points on left area
-            4.1. Top left point
-            4.2. Top right point
-            4.3. Bottom left point
-            4.4. Bottom right point
-        5. Define points on right area
-            5.1. Top left point
-            5.2. Top right point
-            5.3. Bottom left point
-            5.4. Bottom right point
-        ''', justify = LEFT)
+        self.painter = QPainter(self)
+        self.pen = QPen(Qt.red, 3)
+        self.painter.setPen(self.pen)
+        self.pixmap = QPixmap('scan1_r.jpg')
+        self.canvas_lbl.setPixmap(self.pixmap)
+        self.painter.drawPixmap(self.canvas_lbl.rect(), self.pixmap)
 
 
-        self.out_lbl = Label(root)
-        self.out_lbl.place(x = 10, y = 400, height=80, width=150)
-        self.out_lbl.configure(text = 'Out')
+    def get_pos(self, event):
+        self.curr_count_points += 1
+        if self.curr_count_points <= self.COUNT_POINTS:
+            print(event.pos().x())
+            print(event.pos().y())
+            
+            self.painter.begin(self)
+            pen = QPen(Qt.red, 3)
+            self.painter.setPen(pen)
+            self.painter.drawPoint(event.pos().x(), event.pos().y())
+            self.painter.end()
+            self.update()
 
-        self.im = ImageTk.PhotoImage(Image.open('scan1_r.jpg').resize((640, 480)))
-
-        self.canvas.create_image(0, 0, image = self.im, anchor = NW)
-
-    def open_video(self, event):
-        file_name = filedialog.askopenfilename(title = "Select file", filetypes = (("jpeg files","*.jpg"),("all files","*.*")))
-        if file_name == '':
-            return
-        print(file_name)
-
-    def start_scan(self, event):
-        print('start_scan')
-
-    def click_on_canvas(self, event):
-        self.canvas.create_oval(event.x - 3, event.y - 3, event.x + 3, event.y + 3, fill = 'red')
-
-    def set_image_on_canvas(self, image):
-        pass
-
-root = Tk()
-gui = GUI(root)
-mainloop()
+app = QApplication(sys.argv)
+gui = GUI()
+gui.show()
+sys.exit(app.exec_())
