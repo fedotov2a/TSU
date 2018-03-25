@@ -8,10 +8,19 @@ import matplotlib.animation as animation
 import matplotlib.image as mpimg
 from skimage.morphology import skeletonize      # Для скелетизации линии лазера
 from PIL import Image, ImageDraw                # Для рисования на изображении
+from PIL.ImageQt import ImageQt
 from time import sleep
 from mpl_toolkits.mplot3d import Axes3D
 
-class VideoAnalyzer:
+import sys
+from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog
+from PyQt5.QtWidgets import QLabel, QSpinBox, QMenuBar, QMenu, QAction, QPushButton, QStatusBar
+from PyQt5.QtGui import QPainter, QPixmap, QImage, QPen, QColor, QMouseEvent
+from PyQt5.QtCore import Qt, QRect
+from PyQt5 import uic
+
+
+class VideoAnalyzer(QMainWindow):
     break_frame = 800
     RED = 0             # Красная компонента в изображении,
                         # представленном массивом: image[row][pix][color]
@@ -198,81 +207,16 @@ class VideoAnalyzer:
     #----------------Методы---------------------
 
     def __init__(self):
-        # v.avi
-        # self.support_area_top['top_left_point']['x'] = 208
-        # self.support_area_top['top_left_point']['y'] = 57
-        # self.support_area_top['top_right_point']['x'] = 392
-        # self.support_area_top['top_right_point']['y'] = 65
-        # self.support_area_top['bottom_left_point']['x'] = 203
-        # self.support_area_top['bottom_left_point']['y'] = 97
-        # self.support_area_top['bottom_right_point']['x'] = 381
-        # self.support_area_top['bottom_right_point']['y'] = 102
-
-        # self.support_area_bottom['top_left_point']['x'] = 208
-        # self.support_area_bottom['top_left_point']['y'] = 341
-        # self.support_area_bottom['top_right_point']['x'] = 385
-        # self.support_area_bottom['top_right_point']['y'] = 327
-        # self.support_area_bottom['bottom_left_point']['x'] = 216
-        # self.support_area_bottom['bottom_left_point']['y'] = 381
-        # self.support_area_bottom['bottom_right_point']['x'] = 398
-        # self.support_area_bottom['bottom_right_point']['y'] = 363
+        super().__init__()
+        uic.loadUi('ui/mainwindow.ui', self)
         
-        # self.support_area_left['top_left_point']['x'] = 146
-        # self.support_area_left['top_left_point']['y'] = 116
-        # self.support_area_left['top_right_point']['x'] = 180
-        # self.support_area_left['top_right_point']['y'] = 120
-        # self.support_area_left['bottom_left_point']['x'] = 154
-        # self.support_area_left['bottom_left_point']['y'] = 321
-        # self.support_area_left['bottom_right_point']['x'] = 184
-        # self.support_area_left['bottom_right_point']['y'] = 314
+        self.move(70, 70)
+        self.setFixedSize(1200, 680)
 
-        # self.support_area_right['top_left_point']['x'] = 402
-        # self.support_area_right['top_left_point']['y'] = 126
-        # self.support_area_right['top_right_point']['x'] = 445
-        # self.support_area_right['top_right_point']['y'] = 122
-        # self.support_area_right['bottom_left_point']['x'] = 406
-        # self.support_area_right['bottom_left_point']['y'] = 305
-        # self.support_area_right['bottom_right_point']['x'] = 450
-        # self.support_area_right['bottom_right_point']['y'] = 305
+        self.COUNT_POINTS = 16
+        self.curr_count_points = 0
 
-        # v3.avi
-        # self.support_area_top['top_left_point']['x'] = 229
-        # self.support_area_top['top_left_point']['y'] = 69
-        # self.support_area_top['top_right_point']['x'] = 439
-        # self.support_area_top['top_right_point']['y'] = 46
-        # self.support_area_top['bottom_left_point']['x'] = 243
-        # self.support_area_top['bottom_left_point']['y'] = 112
-        # self.support_area_top['bottom_right_point']['x'] = 445
-        # self.support_area_top['bottom_right_point']['y'] = 93
-
-        # self.support_area_bottom['top_left_point']['x'] = 254
-        # self.support_area_bottom['top_left_point']['y'] = 361
-        # self.support_area_bottom['top_right_point']['x'] = 458
-        # self.support_area_bottom['top_right_point']['y'] = 362
-        # self.support_area_bottom['bottom_left_point']['x'] = 244
-        # self.support_area_bottom['bottom_left_point']['y'] = 405
-        # self.support_area_bottom['bottom_right_point']['x'] = 456
-        # self.support_area_bottom['bottom_right_point']['y'] = 409
-        
-        # self.support_area_left['top_left_point']['x'] = 173
-        # self.support_area_left['top_left_point']['y'] = 137
-        # self.support_area_left['top_right_point']['x'] = 219
-        # self.support_area_left['top_right_point']['y'] = 138
-        # self.support_area_left['bottom_left_point']['x'] = 183
-        # self.support_area_left['bottom_left_point']['y'] = 341
-        # self.support_area_left['bottom_right_point']['x'] = 229
-        # self.support_area_left['bottom_right_point']['y'] = 336
-
-        # self.support_area_right['top_left_point']['x'] = 474
-        # self.support_area_right['top_left_point']['y'] = 120
-        # self.support_area_right['top_right_point']['x'] = 514
-        # self.support_area_right['top_right_point']['y'] = 111
-        # self.support_area_right['bottom_left_point']['x'] = 483
-        # self.support_area_right['bottom_left_point']['y'] = 335
-        # self.support_area_right['bottom_right_point']['x'] = 522
-        # self.support_area_right['bottom_right_point']['y'] = 341
-
-        # scan1.avi
+                # scan1.avi
         self.support_area_top['top_left_point']['x'] = 185
         self.support_area_top['top_left_point']['y'] = 96
         self.support_area_top['top_right_point']['x'] = 379
@@ -309,20 +253,54 @@ class VideoAnalyzer:
         self.support_area_right['bottom_right_point']['x'] = 459
         self.support_area_right['bottom_right_point']['y'] = 344
 
-        for key_area, sa in self.support_areas.items():
-            for key_point, xy in sa.items():
-                x, y = self.to_other_coordinates_2d(xy['x'], xy['y'])
-                xy['x'] = x
-                xy['y'] = y
+        self.canvas_lbl.mousePressEvent = self.get_coord_support_points
 
-            print(sa)
-
-        self.find_coeff_for_lines_on_support_area()
-        self.get_instrict_parameters_of_camera()
-        self.find_support_planes()
+        # Соединяем элементы UI с функциями
+        self.start_btn.clicked.connect(self.run)
+        self.open_vid_file_act.triggered.connect(self.open_vid)
 
     #---------------------------------------------------------------------------------------
-    def open_vid(self, filename = 'v.avi'):
+
+    def get_coord_support_points(self, event):
+        '''
+        Получает позицию курсора на канвасе и записывает координаты.
+
+        Последовательность выбора точек жестко зашита:
+            1. Верхняя область
+                1.1. Верхняя левая точка
+                1.2. Верхняя правая точка
+                1.3. Нижняя левая точка
+                1.4. Нижняя правая точка
+            2. Нижняя область
+                2.1-2.4. аналогично
+            3. Левая область
+                3.1-3.4. аналогично
+            4. Правая область
+                4.1-4.4. аналогично
+        '''
+        if self.curr_count_points < self.COUNT_POINTS:
+            sa = ['top_area', 'bottom_area', 'left_area', 'right_area']
+            sp = ['top_left_point', 'top_right_point', 'bottom_left_point', 'bottom_right_point']
+
+            x, y = event.pos().x(), event.pos().y()
+            x, y = self.to_other_coordinates_2d(x, y)
+
+            self.support_areas[sa[self.curr_count_points // 4]][sp[self.curr_count_points % 4]]['x'] = x
+            self.support_areas[sa[self.curr_count_points // 4]][sp[self.curr_count_points % 4]]['y'] = y
+
+            self.curr_count_points += 1
+
+
+    # def PIL_to_QPixmap(self, pil_image):
+    #     '''
+    #     Конвертирует PIL изображение в QPixmap
+    #     '''
+    #     qim = ImageQt(pil_image)
+    #     res = QPixmap.fromImage(qim)
+    #     return res
+
+    #---------------------------------------------------------------------------------------
+    def open_vid(self):
         '''
         Открывает видеофайл.
 
@@ -332,14 +310,25 @@ class VideoAnalyzer:
             imageio.plugins.ffmpeg.download() - хотя работает без этого
                                                 возможно из-за того, что вместе с этим файлом лежит ffmpeg.exe
         '''
-        print('Reading...')
-        self.vid_src = imageio.get_reader(filename,  'ffmpeg')
+        filename, ok = QFileDialog.getOpenFileName(self, "Open Video File", "", "Avi files (*.avi);;Mp4 files (*.mp4);;All files (*.*)")
+
+        if ok:
+            self.vid_src = imageio.get_reader(filename,  'ffmpeg')
+            
+            temp_img = self.vid_src.get_data(50)
+            imageio.imwrite('__temp.jpg', temp_img)
+            self.canvas_lbl.setPixmap(QPixmap('__temp.jpg'))
+
+            # temp_img = self.vid_src.get_data(50)
+            # temp_img = Image.fromarray(temp_img)
+            # temp_img = ImageQt(temp_img)
+            # temp_img = QImage(temp_img)
+            # self.canvas_lbl.setPixmap(QPixmap(temp_img))
 
     def get_vid_skeleton(self):
         '''
         Скелетизация каждого кадра.
         '''
-        # print('Skeletonization...')
         for i, frame in enumerate(self.vid_src):
             if i == self.break_frame:
                 break
@@ -349,7 +338,6 @@ class VideoAnalyzer:
 
             self.vid_skelet.append(frame_skelet)
 
-        print('Len =', len(self.vid_skelet))
 
     #------------------------------------------------------------------------------------
 
@@ -366,8 +354,12 @@ class VideoAnalyzer:
         b = x2 - x1
         c = x1 * y2 - x2 * y1
 
-        p = -a / b
-        q = -c / b
+        try:
+            p = -a / b
+            q = -c / b
+        except:
+            p = -a / (b + 1)
+            q = -c / (b + 1)
 
         return {'a': p, 'b': q}
 
@@ -478,13 +470,15 @@ class VideoAnalyzer:
         '''
         count_lines = 0
         for key_area, arr in self.laser_points_on_support_area.items():
-            if len(arr) > 5:
+            # Проверка по количеству точек
+            if len(arr) > 10:
                 count_lines += 1
-
+               
         if count_lines < 2:
             return None
 
         else:
+            # Выбрать две линии с наибольшим количеством точек
             result = {}
 
             for _ in range(2):
@@ -525,6 +519,7 @@ class VideoAnalyzer:
                 a = (n * xy_sum - x_sum * y_sum) / (n * x2_sum - x_sum**2)
                 b = (y_sum - a * x_sum) / n
             except:
+                print('except 0 0')
                 a = 0
                 b = 0
 
@@ -794,9 +789,6 @@ class VideoAnalyzer:
 #---------------------------------
     fig = plt.figure()
     ims = []
-    # fig2 = plt.figure()
-    # plt.show(block=False)
-
     def paint_lines(self, points, im, num_frame):
         draw = ImageDraw.Draw(im)
 
@@ -848,11 +840,20 @@ class VideoAnalyzer:
             self.find_laser_plane(laser_points_3d)
             self.get_3d_points_of_surface(num_frame)
 
-            img = plt.imshow(im, animated=True)
-            self.ims.append([img])
+            # img = plt.imshow(im, animated=True)
+            # self.ims.append([img])
 
     def run(self):
-        self.open_vid(filename = 'scan1.mp4')
+        for key_area, sa in self.support_areas.items():
+            for key_point, xy in sa.items():
+                x, y = self.to_other_coordinates_2d(xy['x'], xy['y'])
+                xy['x'] = x
+                xy['y'] = y
+
+        self.find_coeff_for_lines_on_support_area()
+        self.get_instrict_parameters_of_camera()
+        self.find_support_planes()
+
         self.get_vid_skeleton()
 
         print('Instrict parameters of camera:')
@@ -863,6 +864,9 @@ class VideoAnalyzer:
         for i, frame in enumerate(self.vid_src):
             if not i % 20:
                 print(i)
+                # imageio.imwrite('__temp.jpg', frame)
+                # self.canvas_lbl.setPixmap(QPixmap('__temp.jpg'))
+                # self.canvas_lbl.update()
 
             if i == self.break_frame:
                 break
@@ -873,43 +877,22 @@ class VideoAnalyzer:
             im = Image.fromarray(frame)
             self.paint_lines(points, im, i)
 
-        ani = animation.ArtistAnimation(self.fig, self.ims, interval=50, blit=True)
-        plt.show()
+            # if not i % 20:
+            #     self.canvas_lbl.setPixmap(self.PIL_to_QPixmap(im))
+            #     self.update()
+
+        # ani = animation.ArtistAnimation(self.fig, self.ims, interval=50, blit=True)
+        # plt.show()
 
         self.vid_src.close()
         self.file_with_3d_points.close()
 
 
 
-    def test(self):
-        pass
-        # image = self.vid_src.get_data(200)
-        # # imageio.imwrite('im.jpg', image)
-        # image_r = image[:, :, self.RED]
-        # binary = image_r > self.THRESHOLD
-        # skeleton = skeletonize(binary)
-        # imageio.imwrite('temp2.jpg', skeleton)
+app = QApplication(sys.argv)
+w = VideoAnalyzer()
+w.show()
+sys.exit(app.exec_())
 
-        # im = Image.open('im.jpg')
-        # draw = ImageDraw.Draw(im)
-
-        # x_min = self.find_min_max_points(self.support_areas['left_area'])['x_min']
-        # x_max = self.find_min_max_points(self.support_areas['left_area'])['x_max']
-        # for x in range(x_min, x_max):
-        #     y = -0.141 * x + 196.269
-
-        #     draw.ellipse((x-1, y-1, x+1, y+1), fill='blue')
-
-        # x_min = self.find_min_max_points(self.support_areas['right_area'])['x_min']
-        # x_max = self.find_min_max_points(self.support_areas['right_area'])['x_max']
-        # for x in range(x_min, x_max):
-        #     y = -0.742 * x + 355.908
-
-        #     draw.ellipse((x-1, y-1, x+1, y+1), fill='blue')
-
-        # im.show()
-
-va = VideoAnalyzer()
-va.run()
 # print(va.coeff_support_planes)
 # print(va.instrict_parameters_of_camera)
