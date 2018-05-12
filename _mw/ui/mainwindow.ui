@@ -34,61 +34,19 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>490</y>
+      <y>240</y>
       <width>560</width>
-      <height>150</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Output / Support planes / Laser plane</string>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="threshold_sb">
-    <property name="geometry">
-     <rect>
-      <x>1141</x>
-      <y>500</y>
-      <width>51</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>255</number>
-    </property>
-    <property name="value">
-     <number>230</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="threshold_btn">
-    <property name="geometry">
-     <rect>
-      <x>1080</x>
-      <y>500</y>
-      <width>61</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Threshold</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="apply_points_lbl">
-    <property name="geometry">
-     <rect>
-      <x>840</x>
-      <y>500</y>
-      <width>91</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
-     <string>Apply points</string>
+     <string>Output</string>
     </property>
    </widget>
    <widget class="QPushButton" name="start_btn">
     <property name="geometry">
      <rect>
-      <x>960</x>
+      <x>1100</x>
       <y>500</y>
       <width>91</width>
       <height>31</height>
@@ -98,30 +56,80 @@
      <string>Start</string>
     </property>
    </widget>
-   <widget class="QLabel" name="iparam_camera_lbl">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>320</y>
-      <width>560</width>
-      <height>150</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Instrict matrix of camera</string>
-    </property>
-   </widget>
    <widget class="QLabel" name="instruction_lbl">
     <property name="geometry">
      <rect>
       <x>0</x>
       <y>0</y>
       <width>560</width>
-      <height>311</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
      <string>Instructions</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="teOutput">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>270</y>
+      <width>551</width>
+      <height>351</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QProgressBar" name="progressBar">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>620</y>
+      <width>551</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+    <property name="textVisible">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="textEdit">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>551</width>
+      <height>211</height>
+     </rect>
+    </property>
+    <property name="readOnly">
+     <bool>true</bool>
+    </property>
+    <property name="html">
+     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1. Open file (*.avi, *.mp4)&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2. Select 16 points&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;    2.1. Top area&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;        a. Top left point&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;        b. Top right point&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;        c. Bottom left point&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;        d. Bottom right point&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;    2.2. Bottom area&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;        a-d. Similarly&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;    2.3. Left area&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;        a-d. Similarly&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;    2.4. Right area&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;        a-d. Similarly&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3. Apply points&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4. Start&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
   </widget>
@@ -136,7 +144,7 @@
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
-     <string>Файл</string>
+     <string>File</string>
     </property>
     <addaction name="open_vid_file_act"/>
    </widget>
@@ -145,7 +153,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="open_vid_file_act">
    <property name="text">
-    <string>Открыть видеофайл</string>
+    <string>Open videofile</string>
    </property>
   </action>
  </widget>
