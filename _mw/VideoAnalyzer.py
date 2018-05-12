@@ -21,7 +21,7 @@ from PyQt5 import uic
 
 
 class VideoAnalyzer(QMainWindow):
-    break_frame = 800
+    BREAK_FRAME = 1000
     RED = 0             # Красная компонента в изображении,
                         # представленном массивом: image[row][pix][color]
                         # или 
@@ -283,7 +283,10 @@ class VideoAnalyzer(QMainWindow):
             sp = ['top_left_point', 'top_right_point', 'bottom_left_point', 'bottom_right_point']
 
             x, y = event.pos().x(), event.pos().y()
+            self.teOutput.append(sa[self.curr_count_points // 4] + ' ' + sp[self.curr_count_points % 4] + ': x: ' + str(x) + ' y: ' + str(y))
+
             x, y = self.to_other_coordinates_2d(x, y)
+
 
             self.support_areas[sa[self.curr_count_points // 4]][sp[self.curr_count_points % 4]]['x'] = x
             self.support_areas[sa[self.curr_count_points // 4]][sp[self.curr_count_points % 4]]['y'] = y
@@ -329,15 +332,17 @@ class VideoAnalyzer(QMainWindow):
         '''
         Скелетизация каждого кадра.
         '''
+        self.progressBar.reset()
+        self.progressBar.setMaximum(self.BREAK_FRAME)
         for i, frame in enumerate(self.vid_src):
-            if i == self.break_frame:
+            if i == self.BREAK_FRAME:
                 break
             frame_red = frame[:, :, self.RED]       # Оставляет только красную компоненту на изображении
             frame_bin = frame_red > self.THRESHOLD  # Бинаризация изображения
             frame_skelet = skeletonize(frame_bin)   # Скелетизация изображения
 
             self.vid_skelet.append(frame_skelet)
-
+            self.progressBar.setValue(i)
 
     #------------------------------------------------------------------------------------
 
@@ -398,6 +403,12 @@ class VideoAnalyzer(QMainWindow):
             self.coeff_lines_support_area[key_area]['right_line']['a'] = right_line['a']
             self.coeff_lines_support_area[key_area]['right_line']['b'] = right_line['b']
 
+            self.teOutput.append(key_area)
+            self.teOutput.append('top_line: ' + 'a: ' + str(round(top_line['a'], 3)) + ' b: ' + str(round(top_line['b'], 3)))
+            self.teOutput.append('bottom_line: ' + 'a: ' + str(round(bottom_line['a'], 3)) + ' b: ' + str(round(bottom_line['b'], 3)))
+            self.teOutput.append('left_line: ' + 'a: ' + str(round(left_line['a'], 3)) + ' b: ' + str(round(left_line['b'], 3)))
+            self.teOutput.append('right_line: ' + 'a: ' + str(round(right_line['a'], 3)) + ' b: ' + str(round(right_line['b'], 3)))
+
     #----------------------------------------------------------------------------------
 
     #-----------------Методы для обнаружения линии лазера на опорных областях----------
@@ -447,18 +458,12 @@ class VideoAnalyzer(QMainWindow):
 
             for y in range(min_max['y_min'], min_max['y_max']):
                 for x in range(min_max['x_min'], min_max['x_max']):
-                    if skeleton_image[y][x] == True:
-                        x_, y_ = self.to_other_coordinates_2d(x, y)
-                        self.laser_points_on_support_area[key_area].append([x_, y_])
-
-        # im = Image.open('im.jpg')
-        # draw = ImageDraw.Draw(im)
-
-        # for _, arr_points in self.laser_points_on_support_area.items():
-        #     for x, y in arr_points:
-        #         draw.ellipse((x-1, y-1, x+1, y+1), fill='blue')
-
-        # im.show()
+                    try:
+                        if skeleton_image[y][x] == True:
+                            x_, y_ = self.to_other_coordinates_2d(x, y)
+                            self.laser_points_on_support_area[key_area].append([x_, y_])
+                    except:
+                        continue
 
     #-----------------------------------------------------------------------
 
@@ -519,7 +524,6 @@ class VideoAnalyzer(QMainWindow):
                 a = (n * xy_sum - x_sum * y_sum) / (n * x2_sum - x_sum**2)
                 b = (y_sum - a * x_sum) / n
             except:
-                print('except 0 0')
                 a = 0
                 b = 0
 
@@ -566,9 +570,7 @@ class VideoAnalyzer(QMainWindow):
             self.coeff_support_planes[key_area]['C'] = c
             self.coeff_support_planes[key_area]['D'] = d
 
-            print(key_area)
-            print(a, b, c, d)
-            print()
+            self.teOutput.append(key_area + ': A: ' + str(round(a, 3)) + ' B: ' + str(round(b, 3)) + ' C: ' + str(round(c, 3)) + ' D: ' + str(round(d, 3)))
 
     def get_instrict_parameters_of_camera(self):
         '''
@@ -638,11 +640,17 @@ class VideoAnalyzer(QMainWindow):
             bottom_line_a = self.coeff_lines_support_area[key_area]['bottom_line']['a']
             bottom_line_b = self.coeff_lines_support_area[key_area]['bottom_line']['b']
 
-
-            top_x = (top_line_b - laser_line_b) / (laser_line_a - top_line_a)
+            try:
+                top_x = (top_line_b - laser_line_b) / (laser_line_a - top_line_a)
+            except:
+                top_x = (top_line_b - laser_line_b) / (laser_line_a - top_line_a + 1)
             top_y = laser_line_a * top_x + laser_line_b
 
-            bottom_x = (bottom_line_b - laser_line_b) / (laser_line_a - bottom_line_a)
+
+            try:
+                bottom_x = (bottom_line_b - laser_line_b) / (laser_line_a - bottom_line_a)
+            except:
+                bottom_x = (bottom_line_b - laser_line_b) / (laser_line_a - bottom_line_a + 1)
             bottom_y = laser_line_a * bottom_x + laser_line_b
 
             return {'x1': top_x, 'y1': top_y, 'x2': bottom_x, 'y2': bottom_y}
@@ -654,10 +662,16 @@ class VideoAnalyzer(QMainWindow):
             right_line_a = self.coeff_lines_support_area[key_area]['right_line']['a']
             right_line_b = self.coeff_lines_support_area[key_area]['right_line']['b']
 
-            left_x = (left_line_b - laser_line_b) / (laser_line_a - left_line_a)
+            try:
+                left_x = (left_line_b - laser_line_b) / (laser_line_a - left_line_a)
+            except:
+                left_x = (left_line_b - laser_line_b) / (laser_line_a - left_line_a + 1)
             left_y = laser_line_a * left_x + laser_line_b
 
-            right_x = (right_line_b - laser_line_b) / (laser_line_a - right_line_a)
+            try:
+                right_x = (right_line_b - laser_line_b) / (laser_line_a - right_line_a)
+            except:
+                right_x = (right_line_b - laser_line_b) / (laser_line_a - right_line_a + 1)
             right_y = laser_line_a * right_x + laser_line_b
 
             return {'x1': left_x, 'y1':left_y, 'x2': right_x, 'y2': right_y}
@@ -730,7 +744,7 @@ class VideoAnalyzer(QMainWindow):
         self.coeff_laser_plane['C'] = c
         self.coeff_laser_plane['D'] = d
 
-        print('Laser plane:', round(a, 3), round(b, 3), round(c, 3), round(d, 3))
+        # self.teOutput.append('Laser plane: ' + ' A: ' + str(round(a, 3)) + ' B: ' + str(round(b, 3)) + ' C: ' + str(round(c, 3)) + ' D: ' + str(round(d, 3)))
 
     def get_3d_points_of_surface(self, num_frame):
         '''
@@ -785,16 +799,47 @@ class VideoAnalyzer(QMainWindow):
         return (320 + x, 240 - y)
         # return x, y
 
+    def paint_surface(self):
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.mplot3d import Axes3D
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+
+        file = open('3d_points.txt', 'r')
+        x = []
+        y = []
+        z = []
+
+        for i, line in enumerate(file):
+            if i % 10 == 0:
+                x_, y_, z_ = line.split(' ')
+                if float(z_) > 20:
+                    continue
+                x.append(float(x_))
+                y.append(float(y_))
+                z.append(float(z_))
+                # x_, y_, z_ = float(x_), float(y_), float(z_)
+                # ax.scatter(x_, y_, z_, s = 1, c = 'green')
+
+        ax.plot_trisurf(x, y, z, cmap='jet')
+
+        ax.set_xlabel('X Label')
+        ax.set_ylabel('Y Label')
+        ax.set_zlabel('Z Label')
+
+        file.close()
+        plt.show()
 
 #---------------------------------
-    fig = plt.figure()
-    ims = []
+    # fig = plt.figure()
+    # ims = []
     def paint_lines(self, points, im, num_frame):
-        draw = ImageDraw.Draw(im)
+        # draw = ImageDraw.Draw(im)
 
         if points is None:
-            img = plt.imshow(im, animated=True)
-            self.ims.append([img])
+            return
+            # img = plt.imshow(im, animated=True)
+            # self.ims.append([img])
 
         else:
             laser_points_3d = []
@@ -808,12 +853,12 @@ class VideoAnalyzer(QMainWindow):
                 laser_points_3d.append(self.find_laser_points_on_support_area_3d(key_area, xy)[0])
                 laser_points_3d.append(self.find_laser_points_on_support_area_3d(key_area, xy)[1])
 
-                r = 6
-                x1, y1 = self.to_default_coordinates_2d(xy['x1'], xy['y1'])
-                x2, y2 = self.to_default_coordinates_2d(xy['x2'], xy['y2'])
+                # r = 6
+                # x1, y1 = self.to_default_coordinates_2d(xy['x1'], xy['y1'])
+                # x2, y2 = self.to_default_coordinates_2d(xy['x2'], xy['y2'])
 
-                draw.ellipse((x1 - r, y1 - r, x1 + r, y1 + r), fill='blue')
-                draw.ellipse((x2 - r, y2 - r, x2 + r, y2 + r), fill='blue')
+                # draw.ellipse((x1 - r, y1 - r, x1 + r, y1 + r), fill='blue')
+                # draw.ellipse((x2 - r, y2 - r, x2 + r, y2 + r), fill='blue')
 
                 #=== Трекинг лазера
                 # if key_area == 'top_area' or key_area == 'bottom_area':
@@ -840,36 +885,51 @@ class VideoAnalyzer(QMainWindow):
             self.find_laser_plane(laser_points_3d)
             self.get_3d_points_of_surface(num_frame)
 
-            # img = plt.imshow(im, animated=True)
-            # self.ims.append([img])
-
     def run(self):
+        # for __init__
         for key_area, sa in self.support_areas.items():
             for key_point, xy in sa.items():
                 x, y = self.to_other_coordinates_2d(xy['x'], xy['y'])
                 xy['x'] = x
                 xy['y'] = y
 
+        # self.THRESHOLD = self.threshold_sb.value()
+
+        self.teOutput.append('Find lines coeff on support area...')
         self.find_coeff_for_lines_on_support_area()
+        self.teOutput.append('----Done----')
+
+        self.teOutput.append('Find instrict parameters of camera...')
         self.get_instrict_parameters_of_camera()
+
+        s_out = ''
+        for k in range(3):
+            for x in self.instrict_parameters_of_camera[(4*k):(4*(k+1))]:
+                s_out += str(round(x, 3)) + ', '
+            self.teOutput.append(s_out)
+            s_out = ''
+
+        self.teOutput.append('----Done----')
+
+        self.teOutput.append('Find support planes...')
         self.find_support_planes()
+        self.teOutput.append('----Done----')
 
+        self.teOutput.append('Find skeleton on frames...')
         self.get_vid_skeleton()
+        self.teOutput.append('----Done----')
 
-        print('Instrict parameters of camera:')
-        print([round(x, 3) for x in self.instrict_parameters_of_camera[0:4]])
-        print([round(x, 3) for x in self.instrict_parameters_of_camera[4:8]])
-        print([round(x, 3) for x in self.instrict_parameters_of_camera[8:12]])
+        self.teOutput.append('Find 3D points...')
+        self.progressBar.reset()
 
         for i, frame in enumerate(self.vid_src):
-            if not i % 20:
-                print(i)
-                # imageio.imwrite('__temp.jpg', frame)
-                # self.canvas_lbl.setPixmap(QPixmap('__temp.jpg'))
-                # self.canvas_lbl.update()
-
-            if i == self.break_frame:
+            self.progressBar.setValue(i)
+            if i == self.BREAK_FRAME:
                 break
+
+            if not i % 20:
+                imageio.imwrite('__temp.jpg', frame)
+                self.canvas_lbl.setPixmap(QPixmap('__temp.jpg'))
 
             self.find_laser_lines_on_support_areas(self.vid_skelet[i])
             points = self.least_square_method()
@@ -877,22 +937,14 @@ class VideoAnalyzer(QMainWindow):
             im = Image.fromarray(frame)
             self.paint_lines(points, im, i)
 
-            # if not i % 20:
-            #     self.canvas_lbl.setPixmap(self.PIL_to_QPixmap(im))
-            #     self.update()
-
-        # ani = animation.ArtistAnimation(self.fig, self.ims, interval=50, blit=True)
-        # plt.show()
+        self.teOutput.append('----Done----')
 
         self.vid_src.close()
         self.file_with_3d_points.close()
 
-
+        self.paint_surface()
 
 app = QApplication(sys.argv)
 w = VideoAnalyzer()
 w.show()
 sys.exit(app.exec_())
-
-# print(va.coeff_support_planes)
-# print(va.instrict_parameters_of_camera)
