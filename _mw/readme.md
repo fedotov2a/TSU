@@ -6,5 +6,4 @@
 
 ![alt tag](https://raw.githubusercontent.com/fedotov2a/TSU/master/_mw/res/Screenshot_223.jpg)
 
-![alt tag](https://raw.githubusercontent.com/fedotov2a/TSU/master/_mw/res/orig.jpg)
-![alt tag](https://raw.githubusercontent.com/fedotov2a/TSU/master/_mw/res/Screenshot_189.jpg)
+![alt tag](https://raw.githubusercontent.com/fedotov2a/TSU/master/_mw/res/rr.jpg)
