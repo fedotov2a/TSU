@@ -6,3 +6,4 @@
 5. Machine Learning [2 sem]
 6. Parallel and distributed programming [1 sem]
 7. Proccessing image [2 sem]
+8. Magdis
