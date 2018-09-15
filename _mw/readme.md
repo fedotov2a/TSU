@@ -7,6 +7,7 @@
 
 Ссылка на программу (c плагином ffmpeg).
 Установка библиотек: pip install -r lss_req.txt
+
 https://yadi.sk/d/_fUacGFP3YPYc8
 
 Скриншоты:
