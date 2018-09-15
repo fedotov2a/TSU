@@ -5,7 +5,7 @@
 2. ffmpeg: (conda install ffmpeg -c conda-forge; imageio.plugins.ffmpeg.download()) или ffmpeg.exe рядом с исполняемым файлом.
 3. imageio==2.3.0, matplotlib==2.2.2, numpy==1.14.5, Pillow==5.1.0, pyqt5==5.10.1, scikit-image==0.14.0, scipy==1.1.0
 
-Ссылка на программу (c плагином ffmpeg)
+Ссылка на программу (c плагином ffmpeg).
 Установка библиотек: pip install -r lss_req.txt
 https://yadi.sk/d/_fUacGFP3YPYc8
 
